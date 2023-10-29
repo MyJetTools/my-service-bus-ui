@@ -1,0 +1,126 @@
+body {
+    margin: 0;
+    padding: 0;
+
+    overflow: hidden;
+    --label-color: gray;
+    --shadow: 0 0 5px lightgray;
+    --shadow-dark: 0 0 5px gray;
+    --border-color: lightgray;
+    --transparent-color: #fffffff5;
+    --vz-input-border-custom: lightgray !important;
+    --vz-input-bg-custom: white !important;
+    --accent-color: #40bb82;
+    --balance-loss-color: red;
+    --inactive-icon-color: rgb(202, 202, 202);
+    --text-color: black;
+    --vz-primary-border-subtle: #40bb82 !important;
+}
+
+
+#main {
+    overflow: hidden;
+    text-align: center;
+    --total-width: 100vw;
+    --total-height: 100vh;
+    --top-menu-height: 37px;
+    --status-bar-height: 30px;
+}
+
+#main-content {
+    width: var(--total-width);
+    height: calc(var(--total-height) - var(--top-menu-height) - var(--status-bar-height));
+    overflow-y: auto;
+}
+
+
+#status-bar {
+    width: 100%;
+    height: var(--status-bar-height);
+    background-color: lightgray;
+    text-align: left;
+    box-shadow: 0 0 5px black;
+}
+
+.status-bar-separator {
+    width: 2px;
+    height: 20px;
+    border-left: solid 1px gray;
+    margin-top: 2px;
+    margin-left: 4px;
+    margin-right: 4px;
+}
+
+
+.table-dark {
+    color: white;
+    background-color: var(--vz-table-active-bg);
+    vertical-align: top;
+}
+
+.led-gray {
+    width: 12px;
+    height: 12px;
+    margin: 5px !important;
+    background-color: #bbb !important;
+    border-radius: 50%;
+    box-shadow: rgb(0, 0, 0) 0 -1px 7px 1px, inset rgb(61, 61, 61) 0 -1px 9px, rgb(110, 110, 110) 0 2px 14px !important;
+    animation-duration: 1s;
+    display: inline-block;
+    padding: 0 !important;
+}
+
+.led-green {
+    width: 12px;
+    height: 12px;
+    margin: 5px !important;
+    background-color: rgb(143, 212, 4) !important;
+    border-radius: 50%;
+    box-shadow: #000 0 -1px 7px 1px, inset rgb(114, 170, 1) 0 -1px 9px, #7D0 0 2px 12px !important;
+    animation-duration: 1s;
+    display: inline-block;
+    padding: 0 !important;
+}
+
+
+.led-blue {
+    width: 12px;
+    height: 12px;
+    margin: 5px !important;
+    background-color: #4AB !important;
+    border-radius: 50%;
+    box-shadow: #000 0 -1px 7px 1px, inset rgb(81, 81, 255) 0 -1px 9px, rgb(194, 219, 255) 0 2px 14px !important;
+    animation-duration: 1s;
+    display: inline-block;
+    padding: 0 !important;
+}
+
+
+.info-line-xs {
+    padding: 0 5px !important;
+    font-size: 10px;
+    background-color: var(--bg-color) !important;
+}
+
+.info-line {
+    padding: 0 5px !important;
+    background-color: var(--bg-color) !important;
+}
+
+
+.info-line-bold {
+    font-weight: bold;
+    padding: 0 5px !important;
+    background-color: var(--bg-color) !important;
+}
+
+.my-badge {
+    padding: 2px !important;
+    margin-right: 2px;
+}
+
+.nav-tabs .active {
+    background-color: black !important;
+    color: white !important;
+    border-bottom: none;
+}
