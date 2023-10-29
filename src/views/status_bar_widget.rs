@@ -59,8 +59,9 @@ pub fn status_bar_widget(cx: Scope) -> Element {
                 td { "Total Pages Size: {total_pages_size}" }
                 td { div { class: "status-bar-separator" } }
 
-                td { "Persistence ver: {main_state.status_bar.persistence_ver}" }
+                td { "SB: {main_state.status_bar.version}" }
                 td { div { class: "status-bar-separator" } }
+                td { "Persistence:{main_state.status_bar.persistence_ver}" }
             }
         }
     }

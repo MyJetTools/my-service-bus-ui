@@ -99,6 +99,7 @@ fn request_loop(cx: &Scope, main_state: &UseSharedState<MainState>) {
                     main_state.status_bar.persistence_ver = result.persistence_version;
                     main_state.status_bar.mem_used = result.system.usedmem;
                     main_state.status_bar.mem_total = result.system.totalmem;
+                    main_state.status_bar.version = result.version;
 
                     main_state.topics = result.topics.items;
                     main_state.sessions = result.sessions.items;

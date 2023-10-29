@@ -8,6 +8,7 @@ use super::{SessionApiModel, TopicQueueWrapperApiModel, TopicsApiModel};
 pub struct RequestApiModel {
     pub topics: TopicsApiModel,
     pub sessions: SessionsApiModel,
+    pub version: String,
     #[serde(rename = "persistenceVersion")]
     pub persistence_version: String,
     pub system: SystemApiModel,
