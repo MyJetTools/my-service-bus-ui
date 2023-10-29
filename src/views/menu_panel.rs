@@ -121,7 +121,7 @@ async fn get_metrics(no: i32) -> Result<RequestApiModel, ServerFnError> {
 
     let url = crate::APP_CTX.settings.get_api();
 
-    let result: RequestApiModel = flurl::FlUrl::new(url)
+    let mut result: RequestApiModel = flurl::FlUrl::new(url)
         .append_path_segment("status")
         .get()
         .await
@@ -129,6 +129,10 @@ async fn get_metrics(no: i32) -> Result<RequestApiModel, ServerFnError> {
         .get_json()
         .await
         .unwrap();
+
+    result.topics.items.sort_by(|a, b| a.id.cmp(&b.id));
+
+    result.sessions.items.sort_by(|a, b| a.id.cmp(&b.id));
 
     return Ok(result);
 }
