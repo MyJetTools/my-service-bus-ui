@@ -119,9 +119,9 @@ async fn get_metrics(no: i32) -> Result<RequestApiModel, ServerFnError> {
         tokio::time::sleep(std::time::Duration::from_millis(1000)).await;
     }
 
-    let url = "http://127.0.0.1:6123";
+    let url = crate::APP_CTX.settings.get_api();
 
-    let mut result: RequestApiModel = flurl::FlUrl::new(url)
+    let result: RequestApiModel = flurl::FlUrl::new(url)
         .append_path_segment("status")
         .get()
         .await
