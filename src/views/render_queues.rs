@@ -18,9 +18,19 @@ pub fn render_queues(cx: Scope, topic_id: Rc<String>) -> Element {
 
     let queues = queues.unwrap();
 
+
+    let mut sorted_queues = queues.queues.iter().map(|queue|{
+        queue
+    }).collect::<Vec<_>>();
+
+
+    sorted_queues.sort_by(|a,b|{
+        a.id.cmp(&b.id)
+    });
+
     let mut odd = false;
 
-    let queues = queues.queues.iter().map(|queue| {
+    let  queues = sorted_queues.into_iter().map(|queue| {
         let bg_color: &str = if odd {
             "var(--vz-table-active-bg)"
         }else{
@@ -142,6 +152,9 @@ pub fn render_queues(cx: Scope, topic_id: Rc<String>) -> Element {
             }
         }
     });
+
+
+
 
     render! {
         table { style: "width:100%; background-color: var(--bg-color);", queues }
