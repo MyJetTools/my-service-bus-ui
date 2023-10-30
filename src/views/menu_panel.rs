@@ -84,6 +84,69 @@ pub fn menu_panel(cx: Scope) -> Element {
 fn request_loop(cx: &Scope, main_state: &UseSharedState<MainState>) {
     let main_state = main_state.to_owned();
 
+    let create_eval = use_eval(cx);
+
+    let eval = create_eval(
+        r#"
+
+        dioxus.send("");
+        
+        setInterval(function(){
+            dioxus.send("");
+        }, 1000);
+
+        // You can receive messages from Rust to JavaScript with the dioxus.recv function
+        //let msg = await dioxus.recv();
+        //console.log(msg);
+        "#,
+    )
+    .unwrap();
+
+    // You can send messages to JavaScript with the send method
+
+    cx.spawn(async move {
+        loop {
+            eval.recv().await.unwrap();
+
+            let result = get_metrics().await;
+
+            match result {
+                Ok(result) => {
+                    println!("Updating: {:?}", result);
+                    let mut main_state = main_state.write();
+
+                    main_state.status_bar.connected = true;
+                    main_state.status_bar.persistence_ver = result.persistence_version;
+                    main_state.status_bar.mem_used = result.system.usedmem;
+                    main_state.status_bar.mem_total = result.system.totalmem;
+                    main_state.status_bar.version = result.version;
+
+                    main_state.topics = result.topics.items;
+                    main_state.sessions = result.sessions.items;
+                    main_state.queues = result.queues;
+                }
+                Err(err) => {
+                    println!("Server err: {:?}", err);
+                    main_state.write().status_bar.disconnected();
+                }
+            }
+        }
+    });
+    /*
+    let future = use_future(cx, (), |_| {
+        async move {
+
+            // You can receive any message from JavaScript with the recv method
+        }
+    });
+
+    match future.value() {
+        Some(v) => {
+            println!("Received: {:?}", v);
+        }
+        _ => println!("Received:No value"),
+    }
+
     cx.spawn(async move {
         let mut no = 0;
         loop {
@@ -112,14 +175,11 @@ fn request_loop(cx: &Scope, main_state: &UseSharedState<MainState>) {
             }
         }
     })
+     */
 }
 
 #[server]
-async fn get_metrics(no: i32) -> Result<RequestApiModel, ServerFnError> {
-    if no > 0 {
-        tokio::time::sleep(std::time::Duration::from_millis(1000)).await;
-    }
-
+async fn get_metrics() -> Result<RequestApiModel, ServerFnError> {
     let url = crate::APP_CTX.settings.get_api();
 
     let mut result: RequestApiModel = flurl::FlUrl::new(url)
