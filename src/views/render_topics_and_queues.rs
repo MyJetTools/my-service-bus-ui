@@ -48,9 +48,9 @@ pub fn render_topics_and_queues(cx: Scope) -> Element {
                     }
                     div { class: "info-line-xs",
                         "Msg/Sec: "
-                        span { style: "color:gray", "{topic.packet_per_sec}" }
+                        span { style: "color:gray", "{topic.messages_per_sec}" }
                     }
-                    div { class: "info-line-xs", "Req/Sec: {topic.messages_per_sec}" }
+                    div { class: "info-line-xs", "Req/Sec: {topic.packet_per_sec}" }
                     div { class: "info-line-xs", "Persist queue: {topic.persist_size}" }
                     div { style: "padding: 5px;background-color: var(--bg-color);",
                         render_graph { elements: values, is_amount: true }
