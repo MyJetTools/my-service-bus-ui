@@ -18,12 +18,19 @@ pub fn render_graph(cx: Scope, is_amount: bool, elements: Vec<i32>) -> Element {
             elements
                 .into_iter()
                 .map(|v| {
-                    let v = *v as f64;
+                    let (v, color) = if *v > 0 {
+                        (*v, "darkgray")
+                    } else {
+                        (-*v, "red")
+                    };
+
+                    let v = v as f64;
                     let max = max as f64;
 
                     let y2 = height - v / max * height;
 
                     let the_x = x;
+
                     x += 2;
                     rsx! {
                         line {
@@ -31,7 +38,7 @@ pub fn render_graph(cx: Scope, is_amount: bool, elements: Vec<i32>) -> Element {
                             y1: "{HEIGHT}",
                             x2: "{the_x}",
                             y2: "{y2}",
-                            style: "stroke:darkgray;stroke-width:2"
+                            style: "stroke:{color};stroke-width:2"
                         }
                     }
                 })
