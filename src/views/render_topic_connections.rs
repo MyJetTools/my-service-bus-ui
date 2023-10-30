@@ -11,7 +11,11 @@ pub fn render_topic_connections(cx: Scope, topic_id: Rc<String>) -> Element {
 
     let topic = main_state.get_topic(topic_id).unwrap();
 
-    let items = topic.publishers.iter().map(|publisher| {
+    let mut publishers: Vec<_> = topic.publishers.iter().collect();
+
+    publishers.sort_by(|a, b| a.session_id.cmp(&b.session_id));
+
+    let items = publishers.into_iter().map(|publisher| {
         match main_state.get_session(publisher.session_id) {
             Some(session) => {
                 let class_name = if publisher.active == 0 {
