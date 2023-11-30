@@ -19,10 +19,8 @@ jobs:
         uses: arduino/setup-protoc@v1             
 
       - name: "Install Dioxus-CLI"
-        run: cargo install dioxus-cli --locked     
+        run: cargo install dioxus-cli  
 
-      - name: Update wasm-bindgen-cli
-        run:  cargo install -f wasm-bindgen-cli --version 0.2.89
       #- name: Install dependencies
       #  run: sudo apt-get update && sudo apt-get install -y libssl-dev          
 
