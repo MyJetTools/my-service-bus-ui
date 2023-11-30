@@ -26,7 +26,7 @@ web = ["dioxus-fullstack/web"]
 rust-extensions = { tag = "0.1.4", git = "https://github.com/MyJetTools/rust-extensions.git", features = [
     "with-tokio",
 ], optional = true }
-my-logger = { tag = "1.0.3", git = "https://github.com/MyJetTools/my-logger.git", optional = true }
+my-logger = { tag = "1.1.0", git = "https://github.com/MyJetTools/my-logger.git", optional = true }
 
 dioxus-fullstack = { version = "*", features = ["router"] }
 
@@ -48,4 +48,4 @@ serde_yaml = { version = "*", optional = true }
 futures = { version = "*", optional = true }
 async-trait = { version = "*", optional = true }
 lazy_static = { version = "*", optional = true }
-flurl = { tag = "0.4.1", git = "https://github.com/MyJetTools/fl-url.git", optional = true }
+flurl = { tag = "0.5.0", git = "https://github.com/MyJetTools/fl-url.git", optional = true }
