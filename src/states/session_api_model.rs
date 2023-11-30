@@ -19,7 +19,7 @@ pub struct SessionApiModel {
     pub id: i64,
     pub name: String,
     pub ip: String,
-    pub version: String,
+    pub version: Option<String>,
     pub connected: String,
     #[serde(rename = "lastIncoming")]
     pub last_incoming: String,
@@ -36,6 +36,12 @@ pub struct SessionApiModel {
 }
 
 impl SessionApiModel {
+    pub fn get_session_as_string(&self) -> &str {
+        match &self.version {
+            Some(version) => version,
+            None => "???",
+        }
+    }
     pub fn get_session_type(&self) -> SessionType {
         match &self.session_type {
             Some(session_type) => {

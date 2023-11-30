@@ -73,6 +73,7 @@ pub fn render_connections(cx: Scope) -> Element {
             }
         });
 
+
         
 
         rsx! {
@@ -86,7 +87,7 @@ pub fn render_connections(cx: Scope) -> Element {
 
                     div { class: "info-line-xs",
                         b { "Client ver: " }
-                        "{session.version}"
+                        "{session.get_session_as_string()}"
                     }
 
                     div { class: "info-line-xs",

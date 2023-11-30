@@ -123,7 +123,7 @@ pub fn render_queues(cx: Scope, topic_id: Rc<String>) -> Element {
                         }
                         td {
                             div { class: "info-line-xs", "{session.name}" }
-                            div { class: "info-line-xs", "{session.version}" }
+                            div { class: "info-line-xs", "{session.get_session_as_string()}" }
                             div { class: "info-line-xs", "{session.ip}" }
                             render_graph { elements: values, is_amount: false }
                         }

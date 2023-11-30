@@ -35,7 +35,7 @@ pub fn render_topic_connections(cx: Scope, topic_id: Rc<String>) -> Element {
                             }
                             td {
                                 div { class: "info-line-bold", "{session.name}" }
-                                div { class: "info-line", "{session.version}" }
+                                div { class: "info-line", "{session.get_session_as_string()}" }
                                 div { class: "info-line", "{session.ip}" }
                             }
                         }
