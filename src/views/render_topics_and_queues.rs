@@ -38,6 +38,24 @@ pub fn render_topics_and_queues(cx: Scope) -> Element {
             rsx!{render_page { page_no: page.id, amount: page.amount, size: page.size, sub_pages: sub_pages }}
         });
 
+        let persist = if let Some(persist) = topic.persist{
+            persist
+        }else{
+            true
+        };
+
+
+        let persist_queue = if persist{
+            rsx!{ div { class: "info-line-xs", "Persist queue: {topic.persist_size}" } }
+        }else{
+          rsx!{
+            div { class: "info-line-xs",
+                "Persist : "
+                span { style: "color:red", "disabled" }
+            }
+        }
+        };
+
         rsx! {
             tr { style: "--bg-color:var({bg_color}); background-color:var({bg_color}); vertical-align: top;border-bottom: 1px solid black;box-shadow: 0 0px 3px black;",
                 td { style: "width:425px",
@@ -51,7 +69,7 @@ pub fn render_topics_and_queues(cx: Scope) -> Element {
                         span { style: "color:gray", "{topic.messages_per_sec}" }
                     }
                     div { class: "info-line-xs", "Req/Sec: {topic.packet_per_sec}" }
-                    div { class: "info-line-xs", "Persist queue: {topic.persist_size}" }
+                    persist_queue,
                     div { style: "padding: 5px;background-color: var(--bg-color);",
                         render_graph { elements: values, is_amount: true }
                     }

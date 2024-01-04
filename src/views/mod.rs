@@ -9,7 +9,6 @@ pub use render_topic_connections::*;
 mod render_queues;
 pub use render_queues::*;
 mod icons;
-pub use icons::*;
 mod render_graph;
 pub use render_graph::*;
 mod render_page;

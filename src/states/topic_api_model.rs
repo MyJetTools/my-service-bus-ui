@@ -21,6 +21,8 @@ pub struct TopicApiModel {
     pub publishers: Vec<TopicPublisherApiModel>,
 
     pub subscribers: Vec<SubscriberApiModel>,
+
+    pub persist: Option<bool>,
 }
 
 impl TopicApiModel {
