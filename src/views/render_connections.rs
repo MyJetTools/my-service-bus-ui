@@ -5,8 +5,9 @@ use crate::{
     utils::format_mem,
 };
 
-pub fn render_connections(cx: Scope) -> Element {
-    let main_state = use_shared_state::<MainState>(cx).unwrap();
+#[component]
+pub fn RenderConnections() -> Element {
+    let main_state = consume_context::<Signal<MainState>>();
 
     let main_state_read_access = main_state.read();
     let mut odd = true;
@@ -25,11 +26,15 @@ pub fn render_connections(cx: Scope) -> Element {
 
         let session_type = match session.get_session_type() {
             SessionType::Tcp => {
-                rsx! { span { class: "badge text-bg-success", "Tcp" } }
+                rsx! {
+                    span { class: "badge text-bg-success", "Tcp" }
+                }
             }
             SessionType::Http => {
                 rsx! {
-                    span { span { class: "badge text-bg-warning", "Http" } }
+                    span {
+                        span { class: "badge text-bg-warning", "Http" }
+                    }
                 }
             }
         };
@@ -50,12 +55,12 @@ pub fn render_connections(cx: Scope) -> Element {
 
             if active>0{
                 rsx! {
-                    span { class: "badge text-bg-success my-badge", publisher }
+                    span { class: "badge text-bg-success my-badge", {publisher} }
                 }
     
             }else {
                 rsx! {
-                    span { class: "badge text-bg-light my-badge", publisher }
+                    span { class: "badge text-bg-light my-badge", {publisher} }
                 }
                     
             }
@@ -65,10 +70,14 @@ pub fn render_connections(cx: Scope) -> Element {
 
         let subscribers_to_render = subscribers.into_iter().map(|(topic, queue, active)|{
             if active>0{
-                rsx! { span { class: "badge text-bg-success my-badge", "{topic}->{queue}" } }
+                rsx! {
+                    span { class: "badge text-bg-success my-badge", "{topic}->{queue}" }
+                }
     
             }else {
-                rsx! { span { class: "badge text-bg-light my-badge", "{topic}->{queue}" } }
+                rsx! {
+                    span { class: "badge text-bg-light my-badge", "{topic}->{queue}" }
+                }
                     
             }
         });
@@ -80,7 +89,7 @@ pub fn render_connections(cx: Scope) -> Element {
             tr { style: "--bg-color:var({bg_color}); background-color:var({bg_color}); vertical-align: top;border-bottom: 1px solid black;",
                 td {
                     div { class: "info-line", "{session.id}" }
-                    div { class: "info-line", session_type }
+                    div { class: "info-line", {session_type} }
                 }
                 td {
                     div { class: "info-line-bold", "{session.name}" }
@@ -101,29 +110,31 @@ pub fn render_connections(cx: Scope) -> Element {
                     }
                     div { class: "info-line-xs",
                         b { "Read: " }
-                        r_size
+                        {r_size}
                     }
                     div { class: "info-line-xs",
                         b { "Written: " }
-                        w_size
+                        {w_size}
                     }
                     div { class: "info-line-xs",
                         b { "R/sec: " }
-                        r_p_s
+                        {r_p_s}
                     }
                     div { class: "info-line-xs",
                         b { "W/sec: " }
-                        w_p_s
+                        {w_p_s}
                     }
                 }
-                td { publishers_to_render }
-                td { subscribers_to_render }
+                td { {publishers_to_render} }
+                td { {subscribers_to_render} }
             }
         }
     });
 
-    render! {
-        table { class: "table table-dark", style: "text-align: left;margin: 0; padding: 0;",
+    rsx! {
+        table {
+            class: "table table-dark",
+            style: "text-align: left;margin: 0; padding: 0;",
             tr { style: "background: black; ",
                 th { "Id" }
                 th { "Info" }
@@ -131,7 +142,7 @@ pub fn render_connections(cx: Scope) -> Element {
 
                 th { "Subscriber" }
             }
-            sessions_to_render
+            {sessions_to_render}
         }
     }
 }

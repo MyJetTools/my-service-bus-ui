@@ -1,14 +1,13 @@
 #![allow(non_snake_case)]
 
-#[cfg(feature = "ssr")]
+#[cfg(feature = "server")]
 use app_ctx::AppCtx;
 
 use dioxus::prelude::*;
-use dioxus_fullstack::prelude::*;
 
-#[cfg(feature = "ssr")]
+#[cfg(feature = "server")]
 mod app_ctx;
-#[cfg(feature = "ssr")]
+#[cfg(feature = "server")]
 mod settings;
 mod states;
 
@@ -18,10 +17,8 @@ mod utils;
 use views::*;
 
 use crate::states::*;
-mod router;
-pub use router::*;
 
-#[cfg(feature = "ssr")]
+#[cfg(feature = "server")]
 lazy_static::lazy_static! {
     pub static ref APP_CTX: AppCtx = {
         AppCtx::new()
@@ -31,34 +28,35 @@ lazy_static::lazy_static! {
 pub const METRICS_HISTORY_SIZE: usize = 150;
 
 fn main() {
-    let config = LaunchBuilder::<FullstackRouterConfig<AppRoute>>::router();
+    let cfg = dioxus::fullstack::Config::new();
 
-    #[cfg(feature = "ssr")]
-    let config = config.addr(std::net::SocketAddr::from(([0, 0, 0, 0], 8080)));
+    #[cfg(feature = "server")]
+    let cfg = cfg.addr(([0, 0, 0, 0], 9001));
 
-    config.launch();
+    LaunchBuilder::fullstack().with_cfg(cfg).launch(Home)
 }
 
-fn Home(cx: Scope) -> Element {
-    use_shared_state_provider(cx, || MainState::new());
+fn Home() -> Element {
+    use_context_provider(|| Signal::new(MainState::new()));
 
-    let active_window = use_shared_state::<MainState>(cx)
-        .unwrap()
-        .read()
-        .get_active_window();
+    let main_state = consume_context::<Signal<MainState>>();
+
+    let active_window = main_state.read().get_active_window();
 
     let content = match active_window {
-        ActiveWindow::TopicsAndQueues => render_topics_and_queues(cx),
-        ActiveWindow::Connections => render_connections(cx),
+        ActiveWindow::TopicsAndQueues => rsx! {
+            RenderTopicsAndQueues {}
+        },
+        ActiveWindow::Connections => RenderConnections(),
     };
     //
     //
-    render! {
+    rsx! {
         div { id: "layout",
-            div { id: "menu-bar", menu_panel {} }
+            div { id: "menu-bar", MenuPanel {} }
 
-            div { id: "main-content", content }
-            status_bar_widget {}
+            div { id: "main-content", {content} }
+            StatusBarWidget {}
         }
     }
 }

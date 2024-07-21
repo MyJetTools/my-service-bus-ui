@@ -4,8 +4,8 @@ use dioxus::prelude::*;
 
 const WIDTH: i64 = 240;
 const HEIGHT: i64 = 50;
-#[inline_props]
-pub fn render_graph(cx: Scope, is_amount: bool, elements: Vec<i32>) -> Element {
+#[component]
+pub fn RenderGraph(is_amount: bool, elements: Vec<i32>) -> Element {
     let mut x = 0;
 
     let height = HEIGHT as f64;
@@ -18,11 +18,7 @@ pub fn render_graph(cx: Scope, is_amount: bool, elements: Vec<i32>) -> Element {
             elements
                 .into_iter()
                 .map(|v| {
-                    let (v, color) = if *v > 0 {
-                        (*v, "darkgray")
-                    } else {
-                        (-*v, "red")
-                    };
+                    let (v, color) = if v > 0 { (v, "darkgray") } else { (-v, "red") };
 
                     let v = v as f64;
                     let max = max as f64;
@@ -57,7 +53,7 @@ pub fn render_graph(cx: Scope, is_amount: bool, elements: Vec<i32>) -> Element {
             if max == 0 {
                 duration_str = "0".to_string();
             } else {
-                if *is_amount {
+                if is_amount {
                     duration_str = max.to_string();
                 } else {
                     let duration = Duration::from_micros(max as u64);
@@ -67,24 +63,31 @@ pub fn render_graph(cx: Scope, is_amount: bool, elements: Vec<i32>) -> Element {
 
             duration_str2 = duration_str.clone();
 
-            result.push(rsx! { text { x: 1, y: 13, fill: "black", "{duration_str.as_str()}" } });
+            result.push(rsx! {
+                text { x: 1, y: 13, fill: "black", "{duration_str.as_str()}" }
+            });
 
-            result.push(rsx! { text { x: 0, y: 12, fill: "lime", "{duration_str2.as_str()}" } });
+            result.push(rsx! {
+                text { x: 0, y: 12, fill: "lime", "{duration_str2.as_str()}" }
+            });
 
             result
         }
         None => vec![],
     };
 
-    render! {
-        svg { style: "font-size:12px; margin:0; padding:0;", width: WIDTH, height: HEIGHT,
+    rsx! {
+        svg {
+            style: "font-size:12px; margin:0; padding:0;",
+            width: WIDTH,
+            height: HEIGHT,
             rect {
                 style: "fill: var(--bg-color); stroke-width:1; stroke:black;",
                 width: WIDTH,
                 height: HEIGHT
             }
-            items.into_iter(),
-            text.into_iter()
+            {items.into_iter()},
+            {text.into_iter()}
         }
     }
 }

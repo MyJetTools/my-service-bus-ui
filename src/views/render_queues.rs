@@ -2,18 +2,20 @@ use dioxus::prelude::*;
 use std::rc::Rc;
 
 use super::icons::*;
-use crate::{states::MainState, views::{render_graph, render_message_id}};
+use crate::{states::MainState, views::*};
 
-#[inline_props]
-pub fn render_queues(cx: Scope, topic_id: Rc<String>) -> Element {
-    let main_state = use_shared_state::<MainState>(cx).unwrap();
+#[component]
+pub fn RenderQueues(topic_id: Rc<String>) -> Element {
+    let main_state = consume_context::<Signal<MainState>>();
 
     let main_state = main_state.read();
 
     let queues = main_state.queues.get(topic_id.as_str());
 
     if queues.is_none() {
-        return render! { div { "No queues" } };
+        return rsx! {
+            div { "No queues" }
+        };
     }
 
     let queues = queues.unwrap();
@@ -49,39 +51,53 @@ pub fn render_queues(cx: Scope, topic_id: Rc<String>) -> Element {
         };
 
         let q_size_badge = if queue.size > 1000 {
-            rsx! { span { class: "badge text-bg-danger", "{queue.size}/{queue.on_delivery}" } }
+            rsx! {
+                span { class: "badge text-bg-danger", "{queue.size}/{queue.on_delivery}" }
+            }
         } else {
-            rsx! { span { class: "badge text-bg-success", "{queue.size}/{queue.on_delivery}" } }
+            rsx! {
+                span { class: "badge text-bg-success", "{queue.size}/{queue.on_delivery}" }
+            }
         };
 
         let queue_type = match queue.queue_type {
-            0 => rsx! { span { class: "badge text-bg-warning", "permanent" } },
-            1 => rsx! { span { class: "badge text-bg-success", "auto-delete" } },
+            0 => rsx! {
+                span { class: "badge text-bg-warning", "permanent" }
+            },
+            1 => rsx! {
+                span { class: "badge text-bg-success", "auto-delete" }
+            },
             2 => {
-                rsx! { span { class: "badge text-bg-primary", "permanent-single-connect" } }
+                rsx! {
+                    span { class: "badge text-bg-primary", "permanent-single-connect" }
+                }
             }
 
-            _ => rsx! { span { class: "badge text-bg-danger", "unknown" } },
+            _ => rsx! {
+                span { class: "badge text-bg-danger", "unknown" }
+            },
         };
 
         let q_periods = if queue.data.len()==0{
-            rsx! { div {} }
+            rsx! {
+                div {}
+            }
         } else {
 
             let mut result = Vec::new();
             for itm in queue.data.iter() {
                 if result.len() > 0 {
-                    result.push(rsx!{" "} );
+                    result.push(rsx!{ " " } );
                 }
                 result.push(rsx!{
-                    render_message_id { message_id: itm.from_id }
+                    RenderMessageId { message_id: itm.from_id }
                     "-"
-                    render_message_id { message_id: itm.to_id }
+                    RenderMessageId { message_id: itm.to_id }
                 });
             }
 
             rsx! {
-                span { class: "badge text-bg-success", result.into_iter() }
+                span { class: "badge text-bg-success", {result.into_iter()} }
             }
         };
 
@@ -89,9 +105,13 @@ pub fn render_queues(cx: Scope, topic_id: Rc<String>) -> Element {
 
         let rendered_subscribers = sessions.into_iter().map(|subscriber|{
             let subscriber_led = if subscriber.active==0{
-                rsx!{ div { class: "led-gray" } }
+                rsx!{
+                    div { class: "led-gray" }
+                }
             }else{
-                rsx!{ div { class: "led-blue" } }
+                rsx!{
+                    div { class: "led-blue" }
+                }
             };
 
             let subscriber_style = if subscriber.delivery_state==0{
@@ -105,7 +125,9 @@ pub fn render_queues(cx: Scope, topic_id: Rc<String>) -> Element {
             let session = main_state.get_session(subscriber.session_id);
 
             if session.is_none(){
-                return rsx!{ div { "Unknown session" } };
+                return rsx!{
+                    div { "Unknown session" }
+                };
             }
 
             let session = session.unwrap();
@@ -117,15 +139,19 @@ pub fn render_queues(cx: Scope, topic_id: Rc<String>) -> Element {
                     style: "--bg-color:var(--vz-table-bg);box-shadow: 0 0 3px black;  margin: 5px; width: 340px; background-color: var(--vz-table-bg);",
                     tr {
                         td {
-                            subscriber_led,
-                            div { span { class: "badge text-bg-dark", "{session.id}" } }
-                            div { span { class: "badge {subscriber_style}", "{subscriber.id}" } }
+                            {subscriber_led},
+                            div {
+                                span { class: "badge text-bg-dark", "{session.id}" }
+                            }
+                            div {
+                                span { class: "badge {subscriber_style}", "{subscriber.id}" }
+                            }
                         }
                         td {
                             div { class: "info-line-xs", "{session.name}" }
                             div { class: "info-line-xs", "{session.get_session_as_string()}" }
                             div { class: "info-line-xs", "{session.ip}" }
-                            render_graph { elements: values, is_amount: false }
+                            RenderGraph { elements: values, is_amount: false }
                         }
                     }
                 }
@@ -140,15 +166,15 @@ pub fn render_queues(cx: Scope, topic_id: Rc<String>) -> Element {
                     div { class: "info-line-bold", "{queue.id}" }
                     div { class: "info-line",
                         span { class: "badge {session_badge}",
-                            plug_icon {}
+                            PlugIcon {}
                             "{sessions_amount}"
                         }
-                        queue_type,
-                        q_size_badge,
-                        q_periods
+                        {queue_type},
+                        {q_size_badge},
+                        {q_periods}
                     }
                 }
-                td { style: "vertical-align: top; width:350px", rendered_subscribers }
+                td { style: "vertical-align: top; width:350px", {rendered_subscribers} }
             }
         }
     });
@@ -156,7 +182,7 @@ pub fn render_queues(cx: Scope, topic_id: Rc<String>) -> Element {
 
 
 
-    render! {
-        table { style: "width:100%; background-color: var(--bg-color);", queues }
+    rsx! {
+        table { style: "width:100%; background-color: var(--bg-color);", {queues} }
     }
 }

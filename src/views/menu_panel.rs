@@ -1,19 +1,21 @@
 use crate::states::{ActiveWindow, MainState, RequestApiModel};
 use dioxus::prelude::*;
-use dioxus_fullstack::prelude::*;
 
-pub fn menu_panel(cx: Scope) -> Element {
-    let main_state = use_shared_state::<MainState>(cx).unwrap();
+#[component]
+pub fn MenuPanel() -> Element {
+    let mut main_state = consume_context::<Signal<MainState>>();
 
     let (tcp_count, http_count) = main_state.read().get_tcp_http_connections_amount();
 
-    let started = use_state(cx, || false);
+    let mut started = use_signal(|| false);
 
     let active_window = main_state.read().get_active_window();
 
     let (topics_and_queues, connections) = match active_window {
         ActiveWindow::TopicsAndQueues => {
-            let topics_and_queue = rsx! { a { class: "nav-link active", "Topics and Queues" } };
+            let topics_and_queue = rsx! {
+                a { class: "nav-link active", "Topics and Queues" }
+            };
 
             let connections = rsx! {
                 a {
@@ -54,24 +56,27 @@ pub fn menu_panel(cx: Scope) -> Element {
         }
     };
 
-    render! {
+    let started_value = *started.read();
+
+    rsx! {
         ul {
             class: "nav nav-tabs",
             style: "border-bottom: none;",
             onmounted: move |_| {
-                if !started.get() {
-                    request_loop(&cx, main_state);
-                    started.set(true);
+                if !started_value {
+                    request_loop(main_state);
+                    *started.write() = true;
                 }
             },
-            li { topics_and_queues }
-            li { connections }
+            li { {topics_and_queues} }
+            li { {connections} }
             li {
                 input {
                     style: "height: 35px;",
                     class: "form-control",
                     oninput: |ctx| {
-                        main_state.write().set_filter_string(ctx.value.clone());
+                        let value = ctx.value();
+                        consume_context::<Signal<MainState>>().write().set_filter_string(value);
                     },
                     r#type: "text",
                     placeholder: "Filter"
@@ -81,12 +86,8 @@ pub fn menu_panel(cx: Scope) -> Element {
     }
 }
 
-fn request_loop(cx: &Scope, main_state: &UseSharedState<MainState>) {
-    let main_state = main_state.to_owned();
-
-    let create_eval = use_eval(cx);
-
-    let eval = create_eval(
+fn request_loop(mut main_state: Signal<MainState>) {
+    let mut eval = eval(
         r#"
 
         dioxus.send("");
@@ -95,10 +96,9 @@ fn request_loop(cx: &Scope, main_state: &UseSharedState<MainState>) {
             dioxus.send("");
         }, 1000);
         "#,
-    )
-    .unwrap();
+    );
 
-    cx.spawn(async move {
+    spawn(async move {
         loop {
             eval.recv().await.unwrap();
 

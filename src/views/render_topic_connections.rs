@@ -3,13 +3,13 @@ use std::rc::Rc;
 use crate::states::MainState;
 use dioxus::prelude::*;
 
-#[inline_props]
-pub fn render_topic_connections(cx: Scope, topic_id: Rc<String>) -> Element {
-    let main_state = use_shared_state::<MainState>(cx).unwrap();
+#[component]
+pub fn RenderTopicConnections(topic_id: Rc<String>) -> Element {
+    let main_state = consume_context::<Signal<MainState>>();
 
     let main_state = main_state.read();
 
-    let topic = main_state.get_topic(topic_id).unwrap();
+    let topic = main_state.get_topic(topic_id.as_str()).unwrap();
 
     let mut publishers: Vec<_> = topic.publishers.iter().collect();
 
@@ -42,9 +42,13 @@ pub fn render_topic_connections(cx: Scope, topic_id: Rc<String>) -> Element {
                     }
                 }
             }
-            None => rsx! { div { "Unknown publisher: {publisher.session_id}" } },
+            None => rsx! {
+                div { "Unknown publisher: {publisher.session_id}" }
+            },
         }
     });
 
-    render! {items}
+    rsx! {
+        {items}
+    }
 }

@@ -2,21 +2,23 @@ use std::rc::Rc;
 
 use dioxus::prelude::{GlobalAttributes, *};
 
-use crate::{
-    states::MainState,
-    views::{
-        render_graph, render_message_id, render_page, render_queues, render_topic_connections,
-    },
-};
+use crate::{states::MainState, views::*};
 
-pub fn render_topics_and_queues(cx: Scope) -> Element {
-    let main_state = use_shared_state::<MainState>(cx).unwrap();
+#[component]
+pub fn RenderTopicsAndQueues() -> Element {
+    let main_state = consume_context::<Signal<MainState>>();
 
     let read = main_state.read();
 
     let mut odd = false;
 
     let filter_string = read.get_filter_string();
+
+    if read.topics.is_empty() {
+        return rsx! {
+            div {}
+        };
+    }
 
     let items = read.topics.iter().filter(|topic|topic.filter_me(filter_string.as_str())). map(|topic| {
 
@@ -35,7 +37,9 @@ pub fn render_topics_and_queues(cx: Scope) -> Element {
         let rendered_pages = topic.pages.iter().map(|page| {
 
             let sub_pages = page.sub_pages.clone();
-            rsx!{render_page { page_no: page.id, amount: page.amount, size: page.size, sub_pages: sub_pages }}
+            rsx!{
+                RenderPage { page_no: page.id, amount: page.amount, size: page.size, sub_pages }
+            }
         });
 
         let persist = if let Some(persist) = topic.persist{
@@ -46,7 +50,9 @@ pub fn render_topics_and_queues(cx: Scope) -> Element {
 
 
         let persist_queue = if persist{
-            rsx!{ div { class: "info-line-xs", "Persist queue: {topic.persist_size}" } }
+            rsx!{
+                div { class: "info-line-xs", "Persist queue: {topic.persist_size}" }
+            }
         }else{
           rsx!{
             div { class: "info-line-xs",
@@ -62,26 +68,30 @@ pub fn render_topics_and_queues(cx: Scope) -> Element {
                     div { class: "info-line-bold", "{topic.id}" }
                     div { class: "info-line-xs",
                         "MsgId: "
-                        render_message_id { message_id: topic.message_id }
+                        RenderMessageId { message_id: topic.message_id }
                     }
                     div { class: "info-line-xs",
                         "Msg/Sec: "
                         span { style: "color:gray", "{topic.messages_per_sec}" }
                     }
                     div { class: "info-line-xs", "Req/Sec: {topic.packet_per_sec}" }
-                    persist_queue,
+                    {persist_queue},
                     div { style: "padding: 5px;background-color: var(--bg-color);",
-                        render_graph { elements: values, is_amount: true }
+                        RenderGraph { elements: values, is_amount: true }
                     }
-                    rendered_pages
+                    {rendered_pages}
                 }
-                td { style: "width:350px", render_topic_connections { topic_id: topic_id.clone() } }
-                td { render_queues { topic_id: topic_id } }
+                td { style: "width:350px",
+                    RenderTopicConnections { topic_id: topic_id.clone() }
+                }
+                td {
+                    RenderQueues { topic_id }
+                }
             }
         }
     });
 
-    render! {
+    rsx! {
         table {
             class: "table table-striped table-dark",
             style: "text-align:left;margin: 0;",
@@ -91,7 +101,7 @@ pub fn render_topics_and_queues(cx: Scope) -> Element {
                 th { "Queues" }
             }
 
-            items
+            {items}
         }
     }
 }
