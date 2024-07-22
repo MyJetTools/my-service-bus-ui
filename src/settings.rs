@@ -24,6 +24,7 @@ impl SettingsModel {
 pub struct EnvSettingsModel {
     pub id: String,
     pub sb_api_url: String,
+    pub host: Option<String>,
     pub cert_location: Option<String>,
     pub cert_password: Option<String>,
 }
@@ -39,8 +40,14 @@ impl EnvSettingsModel {
                 .await
                 .unwrap();
 
-                return FlUrl::new(self.sb_api_url.as_str())
+                let result = FlUrl::new(self.sb_api_url.as_str())
                     .with_client_certificate(client_certificate);
+
+                if let Some(host) = self.host.as_ref() {
+                    return result.set_tls_domain(host.to_string());
+                }
+
+                return result;
             }
         }
 
