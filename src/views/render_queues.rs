@@ -8,9 +8,16 @@ use crate::{states::MainState, views::*};
 pub fn RenderQueues(topic_id: Rc<String>) -> Element {
     let main_state = consume_context::<Signal<MainState>>();
 
-    let main_state = main_state.read();
+    let main_state_read_access = main_state.read();
 
-    let queues = main_state.queues.get(topic_id.as_str());
+
+    if main_state_read_access.data.is_none(){
+        return rsx!{ "No data loaded" };
+    }
+
+    let data = main_state_read_access.data.as_ref().unwrap();
+
+    let queues = data.queues.get(topic_id.as_str());
 
     if queues.is_none() {
         return rsx! {
@@ -40,7 +47,7 @@ pub fn RenderQueues(topic_id: Rc<String>) -> Element {
         };
         odd = !odd;
         let sessions =
-            main_state.get_sessions_connected_to_queue(topic_id.as_str(), queue.id.as_str());
+        main_state_read_access.get_sessions_connected_to_queue(topic_id.as_str(), queue.id.as_str());
 
         let sessions_amount = sessions.len();
 
@@ -122,7 +129,7 @@ pub fn RenderQueues(topic_id: Rc<String>) -> Element {
 
             let values = subscriber.history.clone();
 
-            let session = main_state.get_session(subscriber.session_id);
+            let session = main_state_read_access.get_session(subscriber.session_id);
 
             if session.is_none(){
                 return rsx!{

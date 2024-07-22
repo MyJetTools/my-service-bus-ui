@@ -8,19 +8,25 @@ use crate::{states::MainState, views::*};
 pub fn RenderTopicsAndQueues() -> Element {
     let main_state = consume_context::<Signal<MainState>>();
 
-    let read = main_state.read();
+    let main_state_read_access = main_state.read();
+
+    if main_state_read_access.data.is_none() {
+        return rsx! { "No data loaded" };
+    }
 
     let mut odd = false;
 
-    let filter_string = read.get_filter_string();
+    let filter_string = main_state_read_access.get_filter_string();
 
-    if read.topics.is_empty() {
+    let data = main_state_read_access.data.as_ref().unwrap();
+
+    if data.topics.is_empty() {
         return rsx! {
             div {}
         };
     }
 
-    let items = read.topics.iter().filter(|topic|topic.filter_me(filter_string.as_str())). map(|topic| {
+    let items = data.topics.iter().filter(|topic|topic.filter_me(filter_string.as_str())). map(|topic| {
 
         let bg_color = if odd {
             "--vz-table-active-bg"

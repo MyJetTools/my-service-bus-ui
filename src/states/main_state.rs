@@ -17,24 +17,31 @@ pub struct StatusBarCalculatedValue {
     pub total_pages_size: i64,
 }
 
-pub struct MainState {
+pub struct DataToRender {
     pub topics: Vec<TopicApiModel>,
     pub sessions: Vec<SessionApiModel>,
     pub status_bar: StatusBarState,
     pub queues: HashMap<String, TopicQueueWrapperApiModel>,
+}
+
+pub struct MainState {
     pub active_window: ActiveWindow,
     pub filter_string: String,
+
+    pub envs: Option<Vec<String>>,
+    pub active_env: String,
+
+    pub data: Option<DataToRender>,
 }
 
 impl MainState {
     pub fn new() -> Self {
         Self {
-            topics: Vec::new(),
-            status_bar: StatusBarState::new(),
-            sessions: Vec::new(),
-            queues: HashMap::new(),
+            data: None,
             active_window: ActiveWindow::TopicsAndQueues,
             filter_string: String::new(),
+            envs: None,
+            active_env: "".to_string(),
         }
     }
 
@@ -46,20 +53,24 @@ impl MainState {
             total_pages_size: 0,
         };
 
-        for topic in &self.topics {
-            result.persist_queue += topic.persist_size;
-            result.msg_per_sec += topic.messages_per_sec;
-            result.packets_per_sec += topic.packet_per_sec;
+        if let Some(data) = &self.data {
+            for topic in &data.topics {
+                result.persist_queue += topic.persist_size;
+                result.msg_per_sec += topic.messages_per_sec;
+                result.packets_per_sec += topic.packet_per_sec;
 
-            for page in &topic.pages {
-                result.total_pages_size += page.size;
+                for page in &topic.pages {
+                    result.total_pages_size += page.size;
+                }
             }
         }
+
         result
     }
 
     pub fn get_topic(&self, topic_id: &str) -> Option<&TopicApiModel> {
-        for topic in &self.topics {
+        let data = self.data.as_ref()?;
+        for topic in &data.topics {
             if topic.id == topic_id {
                 return Some(topic);
             }
@@ -69,7 +80,8 @@ impl MainState {
     }
 
     pub fn get_session(&self, id: i64) -> Option<&SessionApiModel> {
-        for session in &self.sessions {
+        let data = self.data.as_ref()?;
+        for session in &data.sessions {
             if session.id == id {
                 return Some(session);
             }
@@ -84,18 +96,21 @@ impl MainState {
         queue_id: &str,
     ) -> Vec<&SubscriberApiModel> {
         let mut result = Vec::new();
-        for topic in &self.topics {
-            if topic.id != topic_id {
-                continue;
-            }
 
-            for subscriber in &topic.subscribers {
-                if subscriber.queue_id == queue_id {
-                    result.push(subscriber)
+        if let Some(data) = &self.data {
+            for topic in &data.topics {
+                if topic.id != topic_id {
+                    continue;
                 }
-            }
 
-            break;
+                for subscriber in &topic.subscribers {
+                    if subscriber.queue_id == queue_id {
+                        result.push(subscriber)
+                    }
+                }
+
+                break;
+            }
         }
 
         result
@@ -109,15 +124,35 @@ impl MainState {
         self.active_window = active_window;
     }
 
+    pub fn has_envs(&self) -> bool {
+        self.envs.is_some()
+    }
+
+    pub fn set_environments(&mut self, envs: Vec<String>) {
+        self.active_env = envs[0].clone();
+        self.envs = Some(envs);
+    }
+
+    pub fn set_active_env(&mut self, env: String) {
+        self.active_env = env;
+        self.data = None;
+    }
+
+    pub fn get_active_env_id(&self) -> String {
+        self.active_env.clone()
+    }
+
     pub fn get_tcp_http_connections_amount(&self) -> (usize, usize) {
         let mut tcp = 0;
         let mut http = 0;
 
-        for session in &self.sessions {
-            if session.get_session_type().is_tcp() {
-                tcp += 1;
-            } else {
-                http += 1;
+        if let Some(data) = &self.data {
+            for session in &data.sessions {
+                if session.get_session_type().is_tcp() {
+                    tcp += 1;
+                } else {
+                    http += 1;
+                }
             }
         }
 
@@ -138,20 +173,22 @@ impl MainState {
         let mut publishers = Vec::new();
         let mut subscribers = Vec::new();
 
-        for topic in &self.topics {
-            for publisher in &topic.publishers {
-                if publisher.session_id == session_id {
-                    publishers.push((topic.id.clone(), publisher.active));
+        if let Some(data) = &self.data {
+            for topic in &data.topics {
+                for publisher in &topic.publishers {
+                    if publisher.session_id == session_id {
+                        publishers.push((topic.id.clone(), publisher.active));
+                    }
                 }
-            }
 
-            for subscriber in &topic.subscribers {
-                if subscriber.session_id == session_id {
-                    subscribers.push((
-                        topic.id.clone(),
-                        subscriber.queue_id.clone(),
-                        subscriber.active,
-                    ));
+                for subscriber in &topic.subscribers {
+                    if subscriber.session_id == session_id {
+                        subscribers.push((
+                            topic.id.clone(),
+                            subscriber.queue_id.clone(),
+                            subscriber.active,
+                        ));
+                    }
                 }
             }
         }

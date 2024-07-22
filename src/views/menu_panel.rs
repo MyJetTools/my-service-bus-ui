@@ -1,4 +1,7 @@
-use crate::states::{ActiveWindow, MainState, RequestApiModel};
+use crate::{
+    states::{ActiveWindow, MainState, RequestApiModel},
+    DataToRender, StatusBarState,
+};
 use dioxus::prelude::*;
 
 #[component]
@@ -58,7 +61,7 @@ pub fn MenuPanel() -> Element {
 
     let started_value = *started.read();
 
-    rsx! {
+    let tabs = rsx! {
         ul {
             class: "nav nav-tabs",
             style: "border-bottom: none;",
@@ -83,6 +86,34 @@ pub fn MenuPanel() -> Element {
                 }
             }
         }
+    };
+
+    let envs = main_state.read().envs.clone().unwrap();
+
+    let envs_options = envs.into_iter().map(|env| {
+        rsx! {
+            option { {env } }
+        }
+    });
+
+    rsx! {
+        table { style: "width:100%",
+
+            tr {
+                td { {tabs} }
+                td {
+
+                    select {
+                        class: "form-select",
+                        oninput: |ctx| {
+                            let value = ctx.value();
+                            consume_context::<Signal<MainState>>().write().set_active_env(value);
+                        },
+                        {envs_options}
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -102,30 +133,36 @@ fn request_loop(mut main_state: Signal<MainState>) {
         loop {
             eval.recv().await.unwrap();
 
-            let result = get_metrics().await;
+            let env_id = main_state.read().get_active_env_id();
+
+            let result = get_metrics(env_id).await;
 
             match result {
                 Ok(result) => {
                     println!("Updating: {:?}", result);
                     let mut main_state = main_state.write();
 
-                    main_state.status_bar.connected = true;
-                    main_state.status_bar.persistence_ver = result.persistence_version;
-                    main_state.status_bar.mem_used = result.system.usedmem;
-                    main_state.status_bar.mem_total = result.system.totalmem;
-                    main_state.status_bar.version = if let Some(version) = result.version {
-                        version
-                    } else {
-                        "???".to_string()
+                    let data = DataToRender {
+                        status_bar: StatusBarState {
+                            connected: true,
+                            persistence_ver: result.persistence_version,
+                            mem_used: result.system.usedmem,
+                            mem_total: result.system.totalmem,
+                            version: if let Some(version) = result.version {
+                                version
+                            } else {
+                                "???".to_string()
+                            },
+                        },
+                        topics: result.topics.items,
+                        sessions: result.sessions.items,
+                        queues: result.queues,
                     };
-
-                    main_state.topics = result.topics.items;
-                    main_state.sessions = result.sessions.items;
-                    main_state.queues = result.queues;
+                    main_state.data = Some(data);
                 }
                 Err(err) => {
                     println!("Server err: {:?}", err);
-                    main_state.write().status_bar.disconnected();
+                    main_state.write().data = None;
                 }
             }
         }
@@ -133,10 +170,12 @@ fn request_loop(mut main_state: Signal<MainState>) {
 }
 
 #[server]
-async fn get_metrics() -> Result<RequestApiModel, ServerFnError> {
-    let url = crate::APP_CTX.settings.get_api();
+async fn get_metrics(id: String) -> Result<RequestApiModel, ServerFnError> {
+    let settings = crate::APP_CTX.settings.get_settings().await;
 
-    let mut result: RequestApiModel = flurl::FlUrl::new(url)
+    let fl_url = settings.get_fl_url(id.as_str()).await;
+
+    let mut result: RequestApiModel = fl_url
         .append_path_segment("status")
         .get()
         .await

@@ -1,13 +1,13 @@
-use crate::settings::SettingsModel;
+use crate::settings::SettingsReader;
 
 pub struct AppCtx {
-    pub settings: SettingsModel,
+    pub settings: SettingsReader,
 }
 
 impl AppCtx {
     pub fn new() -> Self {
         Self {
-            settings: SettingsModel,
+            settings: SettingsReader::new(),
         }
     }
 }

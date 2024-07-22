@@ -39,6 +39,39 @@ fn main() {
 fn Home() -> Element {
     use_context_provider(|| Signal::new(MainState::new()));
 
+    let mut main_state = consume_context::<Signal<MainState>>();
+
+    let has_envs = main_state.read().has_envs();
+
+    if has_envs {
+        return ActiveApp();
+    }
+
+    let resource = use_resource(|| get_envs());
+
+    let data = resource.read_unchecked();
+
+    match &*data {
+        Some(data) => match data {
+            Ok(result) => {
+                main_state.write().set_environments(result.clone());
+                return ActiveApp();
+            }
+            Err(err) => {
+                let err = format!("Error loading environments. Err: {}", err);
+                return rsx! {
+                    {err}
+                };
+            }
+        },
+
+        None => {
+            return rsx! { "Loading environments..." };
+        }
+    }
+}
+
+fn ActiveApp() -> Element {
     let main_state = consume_context::<Signal<MainState>>();
 
     let active_window = main_state.read().get_active_window();
@@ -49,8 +82,7 @@ fn Home() -> Element {
         },
         ActiveWindow::Connections => RenderConnections(),
     };
-    //
-    //
+
     rsx! {
         div { id: "layout",
             div { id: "menu-bar", MenuPanel {} }
@@ -59,4 +91,11 @@ fn Home() -> Element {
             StatusBarWidget {}
         }
     }
+}
+
+#[server]
+async fn get_envs() -> Result<Vec<String>, ServerFnError> {
+    let settings = crate::APP_CTX.settings.get_settings().await;
+
+    Ok(settings.envs.iter().map(|env| env.id.clone()).collect())
 }

@@ -5,9 +5,16 @@ use dioxus::prelude::*;
 pub fn StatusBarWidget() -> Element {
     let main_state = consume_context::<Signal<MainState>>();
 
-    let main_state = &main_state.read();
+    let main_state_read_access = &main_state.read();
 
-    let calculated_values = main_state.get_status_bar_calculated_values();
+    let (status_bar_data, sessions_count) = if let Some(data) = main_state_read_access.data.as_ref()
+    {
+        (data.status_bar.clone(), data.sessions.len())
+    } else {
+        (StatusBarState::new(), 0)
+    };
+
+    let calculated_values = main_state_read_access.get_status_bar_calculated_values();
 
     let persist_queue = if calculated_values.persist_queue < 5000 {
         rsx! {
@@ -19,7 +26,7 @@ pub fn StatusBarWidget() -> Element {
         }
     };
 
-    let connected = if main_state.status_bar.connected {
+    let connected = if status_bar_data.connected {
         rsx! {
             b { style: "color:green", "Yes" }
         }
@@ -29,16 +36,14 @@ pub fn StatusBarWidget() -> Element {
         }
     };
 
-    let sessions_count = main_state.sessions.len();
-
     let session_color = if sessions_count == 0 {
         "green"
     } else {
         "black"
     };
 
-    let mem_used = format_mem(main_state.status_bar.mem_used);
-    let mem_total = format_mem(main_state.status_bar.mem_total);
+    let mem_used = format_mem(status_bar_data.mem_used);
+    let mem_total = format_mem(status_bar_data.mem_total);
 
     let total_pages_size = format_mem(calculated_values.total_pages_size);
 
@@ -88,11 +93,11 @@ pub fn StatusBarWidget() -> Element {
                     div { class: "status-bar-separator" }
                 }
 
-                td { "SB: {main_state.status_bar.version}" }
+                td { "SB: {status_bar_data.version}" }
                 td {
                     div { class: "status-bar-separator" }
                 }
-                td { "Persistence:{main_state.status_bar.persistence_ver}" }
+                td { "Persistence:{status_bar_data.persistence_ver}" }
             }
         }
     }

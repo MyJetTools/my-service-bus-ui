@@ -1,10 +1,10 @@
+#[derive(Debug, Clone)]
 pub struct StatusBarState {
     pub connected: bool,
     pub mem_used: i64,
     pub mem_total: i64,
     pub version: String,
     pub persistence_ver: String,
-    pub started: bool,
 }
 
 impl StatusBarState {
@@ -15,7 +15,6 @@ impl StatusBarState {
             mem_total: 0,
             persistence_ver: "???".to_string(),
             version: "???".to_string(),
-            started: false,
         }
     }
 

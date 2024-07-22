@@ -10,12 +10,19 @@ pub fn RenderConnections() -> Element {
     let main_state = consume_context::<Signal<MainState>>();
 
     let main_state_read_access = main_state.read();
-    let mut odd = true;
 
+
+    if main_state_read_access.data.is_none(){
+        return rsx!{ "No data loaded" };
+    }
+
+    let mut odd = true;
 
     let filter_string = main_state_read_access.get_filter_string();
 
-    let sessions_to_render = main_state_read_access.sessions.iter().filter(|session|session.filter_me(filter_string.as_str())). map(|session| {
+    let data = main_state_read_access.data.as_ref().unwrap();
+
+    let sessions_to_render = data.sessions.iter().filter(|session|session.filter_me(filter_string.as_str())). map(|session| {
         let bg_color = if odd {
             "--vz-table-active-bg"
         } else {
