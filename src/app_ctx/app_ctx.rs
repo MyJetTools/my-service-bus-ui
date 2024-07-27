@@ -1,13 +1,15 @@
-use crate::settings::SettingsReader;
+use my_settings_reader::SettingsReader;
+
+use crate::settings::SettingsModel;
 
 pub struct AppCtx {
-    pub settings: SettingsReader,
+    pub settings: SettingsReader<SettingsModel>,
 }
 
 impl AppCtx {
     pub fn new() -> Self {
         Self {
-            settings: SettingsReader::new(),
+            settings: SettingsReader::new("~/.my-sb-ui"),
         }
     }
 }
