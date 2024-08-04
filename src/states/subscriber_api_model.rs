@@ -1,5 +1,5 @@
 use serde::*;
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct SubscriberApiModel {
     pub id: i64,
     #[serde(rename = "sessionId")]

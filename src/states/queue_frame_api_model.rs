@@ -1,6 +1,6 @@
 use serde::*;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct QueueFrameApiModel {
     #[serde(rename = "fromId")]
     pub from_id: i64,

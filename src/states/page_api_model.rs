@@ -1,6 +1,6 @@
 use serde::*;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct PageApiModel {
     pub id: i64,
     pub amount: i64,

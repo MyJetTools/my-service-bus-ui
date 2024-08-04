@@ -1,7 +1,7 @@
 use super::QueueFrameApiModel;
 use serde::*;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct TopicQueueApiModel {
     pub id: String,
     #[serde(rename = "queueType")]
@@ -12,7 +12,7 @@ pub struct TopicQueueApiModel {
     pub data: Vec<QueueFrameApiModel>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct TopicQueueWrapperApiModel {
     pub queues: Vec<TopicQueueApiModel>,
     #[serde(rename = "snapshotId")]

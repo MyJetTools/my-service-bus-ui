@@ -2,7 +2,7 @@ use serde::*;
 
 use super::{PageApiModel, SubscriberApiModel, TopicPublisherApiModel};
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct TopicApiModel {
     pub id: String,
     #[serde(rename = "messageId")]
@@ -45,7 +45,7 @@ impl TopicApiModel {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct TopicsApiModel {
     pub items: Vec<TopicApiModel>,
 }

@@ -170,23 +170,8 @@ fn request_loop(mut main_state: Signal<MainState>) {
 }
 
 #[server]
-async fn get_metrics(id: String) -> Result<RequestApiModel, ServerFnError> {
-    let settings = crate::APP_CTX.settings.get_settings().await;
-
-    let fl_url = settings.get_fl_url(id.as_str()).await;
-
-    let mut result: RequestApiModel = fl_url
-        .append_path_segment("status")
-        .get()
-        .await
-        .unwrap()
-        .get_json()
-        .await
-        .unwrap();
-
-    result.topics.items.sort_by(|a, b| a.id.cmp(&b.id));
-
-    result.sessions.items.sort_by(|a, b| a.id.cmp(&b.id));
+async fn get_metrics(env: String) -> Result<RequestApiModel, ServerFnError> {
+    let result = crate::APP_CTX.cached_data.get(env.as_str()).await;
 
     return Ok(result);
 }
