@@ -20,6 +20,9 @@ pub struct SessionApiModel {
     pub name: String,
     pub ip: String,
     pub version: Option<String>,
+    #[serde(rename = "envInfo")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub env_info: Option<String>,
     pub connected: String,
     #[serde(rename = "lastIncoming")]
     pub last_incoming: String,

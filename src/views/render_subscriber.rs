@@ -44,6 +44,18 @@ pub fn render_subscriber(main_state: &MainState, subscriber: &SubscriberApiModel
         rsx! {}
     };
 
+    let env_info = if let Some(env_info) = session.env_info.as_ref() {
+        rsx! {
+            span {
+                style: "background: white;color: black;",
+                class: "badge badge-light",
+                "{env_info}"
+            }
+        }
+    } else {
+        rsx! {}
+    };
+
     rsx! {
         table {
             class: "table table-dark",
@@ -60,7 +72,10 @@ pub fn render_subscriber(main_state: &MainState, subscriber: &SubscriberApiModel
                 }
                 td {
                     {subscriber_info}
-                    div { class: "info-line-xs", "{session.name}" }
+                    div { class: "info-line-xs",
+                        {env_info}
+                        "{session.name}"
+                    }
                     div { class: "info-line-xs", "{session.get_session_as_string()}" }
                     div { class: "info-line-xs", "{session.ip}" }
                     RenderGraph { elements: values, is_amount: false }

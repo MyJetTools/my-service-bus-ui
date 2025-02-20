@@ -91,6 +91,17 @@ pub fn RenderConnections() -> Element {
 
 
         
+        let env_info = if let Some(env_info) = session.env_info.as_ref() {
+            rsx! {
+                span {
+                    style: "background: white;color: black;",
+                    class: "badge badge-light",
+                    "{env_info}"
+                }
+            }
+        } else {
+            rsx! {}
+        };
 
         rsx! {
             tr { style: "--bg-color:var({bg_color}); background-color:var({bg_color}); vertical-align: top;border-bottom: 1px solid black;",
@@ -110,6 +121,8 @@ pub fn RenderConnections() -> Element {
                         b { "Ip: " }
                         "{session.ip}"
                     }
+
+                    div { class: "info-line-xs", {env_info} }
 
                     div { class: "info-line-xs",
                         b { "Connected: " }

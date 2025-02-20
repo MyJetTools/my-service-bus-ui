@@ -24,6 +24,20 @@ pub fn RenderTopicConnections(topic_id: Rc<String>) -> Element {
                     "led-green"
                 };
 
+                let env_info = if let Some(env_info) = session.env_info.as_ref() {
+                    rsx! {
+                        div { style: "padding: 0;",
+                            span {
+                                style: "background: white;color: black;",
+                                class: "badge badge-light",
+                                "{env_info}"
+                            }
+                        }
+                    }
+                } else {
+                    rsx! {}
+                };
+
                 rsx! {
                     table {
                         class: "table table-dark",
@@ -36,6 +50,7 @@ pub fn RenderTopicConnections(topic_id: Rc<String>) -> Element {
                             td {
                                 div { class: "info-line-bold", "{session.name}" }
                                 div { class: "info-line", "{session.get_session_as_string()}" }
+                                {env_info}
                                 div { class: "info-line", "{session.ip}" }
                             }
                         }
