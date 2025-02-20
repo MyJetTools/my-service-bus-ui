@@ -1,4 +1,4 @@
-use dioxus::prelude::{GlobalAttributes, *};
+use dioxus::prelude::*;
 
 use crate::{
     states::{MainState, SessionType},

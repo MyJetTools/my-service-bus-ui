@@ -17,3 +17,5 @@ mod render_connections;
 pub use render_connections::*;
 mod render_message_id;
 pub use render_message_id::*;
+pub mod dialogs;
+mod render_subscriber;

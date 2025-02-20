@@ -9,5 +9,7 @@ pub struct SubscriberApiModel {
     pub active: i64,
     #[serde(rename = "deliveryState")]
     pub delivery_state: u8,
+    #[serde(rename = "deliveryStateStr")]
+    pub delivery_state_str: Option<String>,
     pub history: Vec<i32>,
 }

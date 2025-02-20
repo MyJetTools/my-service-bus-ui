@@ -4,7 +4,7 @@ use dioxus::prelude::*;
 pub fn PlugIcon() -> Element {
     rsx! {
         span { style: "margin-right:3px",
-            img { src: "/img/plug.svg", style: "width:8px" }
+            img { src: "/assets/img/plug.svg", style: "width:8px" }
         }
     }
 }

@@ -1,7 +1,11 @@
 FROM ubuntu:22.04
 
-COPY ./target/release/my-sb-ui ./target/release/my-sb-ui
-COPY ./dist ./dist
+ENV PORT=9001
+ENV IP=0.0.0.0
 
-RUN chmod +x ./target/release/my-sb-ui
-ENTRYPOINT ["./target/release/my-sb-ui"]
+EXPOSE 9001
+
+COPY ./target/dx/my-sb-ui/release/web /target/dx/my-sb-ui/release/web
+RUN chmod +x /target/dx/my-sb-ui/release/web/server
+WORKDIR /target/dx/my-sb-ui/release/web/
+ENTRYPOINT ["./server" ]

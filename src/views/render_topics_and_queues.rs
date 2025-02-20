@@ -1,6 +1,6 @@
 use std::rc::Rc;
 
-use dioxus::prelude::{GlobalAttributes, *};
+use dioxus::prelude::*;
 
 use crate::{states::MainState, views::*};
 
@@ -44,7 +44,12 @@ pub fn RenderTopicsAndQueues() -> Element {
 
             let sub_pages = page.sub_pages.clone();
             rsx!{
-                RenderPage { page_no: page.id, amount: page.amount, size: page.size, sub_pages }
+                RenderPage {
+                    page_no: page.id,
+                    amount: page.amount,
+                    size: page.size,
+                    sub_pages,
+                }
             }
         });
 
@@ -81,7 +86,7 @@ pub fn RenderTopicsAndQueues() -> Element {
                         span { style: "color:gray", "{topic.messages_per_sec}" }
                     }
                     div { class: "info-line-xs", "Req/Sec: {topic.packet_per_sec}" }
-                    {persist_queue},
+                    {persist_queue}
                     div { style: "padding: 5px;background-color: var(--bg-color);",
                         RenderGraph { elements: values, is_amount: true }
                     }

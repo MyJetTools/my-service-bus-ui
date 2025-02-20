@@ -1,14 +1,6 @@
-#![allow(non_snake_case)]
-
-#[cfg(feature = "server")]
-use app_ctx::*;
-
+use dialogs::*;
 use dioxus::prelude::*;
 
-#[cfg(feature = "server")]
-mod app_ctx;
-#[cfg(feature = "server")]
-mod settings;
 mod states;
 
 mod views;
@@ -20,38 +12,21 @@ use views::*;
 use crate::states::*;
 
 #[cfg(feature = "server")]
-lazy_static::lazy_static! {
-    pub static ref APP_CTX: std::sync::Arc<AppCtx> = {
-        use std::{sync::Arc, time::Duration};
-        use app_ctx::UpdateTimer;
-        use rust_extensions::MyTimer;
-
-        let app_ctx = Arc::new(AppCtx::new());
-
-        let mut timer = MyTimer::new(Duration::from_secs(1));
-
-        timer.register_timer("Background request", Arc::new(UpdateTimer::new(app_ctx.clone())));
-
-        timer.start(app_ctx.app_states.clone(), my_logger::LOGGER.clone());
-
-
-
-        app_ctx
-    };
-}
+mod server;
 
 pub const METRICS_HISTORY_SIZE: usize = 150;
 
 fn main() {
-    let cfg = dioxus::fullstack::Config::new();
-
-    #[cfg(feature = "server")]
-    let cfg = cfg.addr(([0, 0, 0, 0], 9001));
-
-    LaunchBuilder::fullstack().with_cfg(cfg).launch(Home)
+    dioxus::LaunchBuilder::new()
+        .with_cfg(server_only!(ServeConfig::builder().incremental(
+            IncrementalRendererConfig::default()
+                .invalidate_after(std::time::Duration::from_secs(120)),
+        )))
+        .launch(App)
 }
 
-fn Home() -> Element {
+#[component]
+fn App() -> Element {
     use_context_provider(|| Signal::new(MainState::new()));
 
     let mut main_state = consume_context::<Signal<MainState>>();
@@ -86,6 +61,7 @@ fn Home() -> Element {
     }
 }
 
+#[component]
 fn ActiveApp() -> Element {
     let main_state = consume_context::<Signal<MainState>>();
 
@@ -104,12 +80,13 @@ fn ActiveApp() -> Element {
 
             div { id: "main-content", {content} }
             StatusBarWidget {}
+            RenderDialog {}
         }
     }
 }
 
 #[server]
 async fn get_envs() -> Result<Vec<String>, ServerFnError> {
-    let settings = crate::APP_CTX.settings_reader.get_settings().await;
+    let settings = crate::server::APP_CTX.settings_reader.get_settings().await;
     Ok(settings.envs.iter().map(|env| env.id.clone()).collect())
 }

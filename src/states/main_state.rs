@@ -1,7 +1,8 @@
 use std::collections::HashMap;
 
 use super::{
-    SessionApiModel, StatusBarState, SubscriberApiModel, TopicApiModel, TopicQueueWrapperApiModel,
+    DialogState, SessionApiModel, StatusBarState, SubscriberApiModel, TopicApiModel,
+    TopicQueueWrapperApiModel,
 };
 
 #[derive(Debug, Clone)]
@@ -32,6 +33,8 @@ pub struct MainState {
     pub active_env: String,
 
     pub data: Option<DataToRender>,
+
+    pub dialog: Option<DialogState>,
 }
 
 impl MainState {
@@ -42,6 +45,7 @@ impl MainState {
             filter_string: String::new(),
             envs: None,
             active_env: "".to_string(),
+            dialog: None,
         }
     }
 
@@ -194,5 +198,9 @@ impl MainState {
         }
 
         (publishers, subscribers)
+    }
+
+    pub fn hide_dialog(&mut self) {
+        self.dialog = None;
     }
 }

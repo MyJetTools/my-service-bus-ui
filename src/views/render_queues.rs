@@ -10,9 +10,8 @@ pub fn RenderQueues(topic_id: Rc<String>) -> Element {
 
     let main_state_read_access = main_state.read();
 
-
-    if main_state_read_access.data.is_none(){
-        return rsx!{ "No data loaded" };
+    if main_state_read_access.data.is_none() {
+        return rsx! { "No data loaded" };
     }
 
     let data = main_state_read_access.data.as_ref().unwrap();
@@ -27,15 +26,9 @@ pub fn RenderQueues(topic_id: Rc<String>) -> Element {
 
     let queues = queues.unwrap();
 
+    let mut sorted_queues = queues.queues.iter().map(|queue| queue).collect::<Vec<_>>();
 
-    let mut sorted_queues = queues.queues.iter().map(|queue|{
-        queue
-    }).collect::<Vec<_>>();
-
-
-    sorted_queues.sort_by(|a,b|{
-        a.id.cmp(&b.id)
-    });
+    sorted_queues.sort_by(|a, b| a.id.cmp(&b.id));
 
     let mut odd = false;
 
@@ -111,60 +104,16 @@ pub fn RenderQueues(topic_id: Rc<String>) -> Element {
 
 
         let rendered_subscribers = sessions.into_iter().map(|subscriber|{
-            let subscriber_led = if subscriber.active==0{
-                rsx!{
-                    div { class: "led-gray" }
-                }
-            }else{
-                rsx!{
-                    div { class: "led-blue" }
-                }
-            };
+            super::render_subscriber::render_subscriber(&main_state_read_access, subscriber)        });
 
-            let subscriber_style = if subscriber.delivery_state==0{
-                "text-bg-primary"
-            }else{
-                "text-bg-danger"
-            };
 
-            let values = subscriber.history.clone();
-
-            let session = main_state_read_access.get_session(subscriber.session_id);
-
-            if session.is_none(){
-                return rsx!{
-                    div { "Unknown session" }
-                };
-            }
-
-            let session = session.unwrap();
-            
-
+        let delete_queue = if sessions_amount == 0{
             rsx!{
-                table {
-                    class: "table table-dark",
-                    style: "--bg-color:var(--vz-table-bg);box-shadow: 0 0 3px black;  margin: 5px; width: 340px; background-color: var(--vz-table-bg);",
-                    tr {
-                        td {
-                            {subscriber_led},
-                            div {
-                                span { class: "badge text-bg-dark", "{session.id}" }
-                            }
-                            div {
-                                span { class: "badge {subscriber_style}", "{subscriber.id}" }
-                            }
-                        }
-                        td {
-                            div { class: "info-line-xs", "{session.name}" }
-                            div { class: "info-line-xs", "{session.get_session_as_string()}" }
-                            div { class: "info-line-xs", "{session.ip}" }
-                            RenderGraph { elements: values, is_amount: false }
-                        }
-                    }
-                }
+                span { style: "cursor:pointer", onclick: move |_| {}, " x" }
             }
-        });
-
+        }else{
+            rsx!{}
+        };
 
 
         rsx! {
@@ -175,19 +124,17 @@ pub fn RenderQueues(topic_id: Rc<String>) -> Element {
                         span { class: "badge {session_badge}",
                             PlugIcon {}
                             "{sessions_amount}"
+                            {delete_queue}
                         }
-                        {queue_type},
-                        {q_size_badge},
+                        {queue_type}
+                        {q_size_badge}
                         {q_periods}
                     }
                 }
-                td { style: "vertical-align: top; width:350px", {rendered_subscribers} }
+                td { style: "vertical-align: top; width:300px", {rendered_subscribers} }
             }
         }
     });
-
-
-
 
     rsx! {
         table { style: "width:100%; background-color: var(--bg-color);", {queues} }

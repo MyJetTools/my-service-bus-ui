@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use crate::{
     states::{ActiveWindow, MainState, RequestApiModel},
     DataToRender, StatusBarState,
@@ -82,7 +84,7 @@ pub fn MenuPanel() -> Element {
                         consume_context::<Signal<MainState>>().write().set_filter_string(value);
                     },
                     r#type: "text",
-                    placeholder: "Filter"
+                    placeholder: "Filter",
                 }
             }
         }
@@ -92,7 +94,7 @@ pub fn MenuPanel() -> Element {
 
     let envs_options = envs.into_iter().map(|env| {
         rsx! {
-            option { {env } }
+            option { {env} }
         }
     });
 
@@ -118,21 +120,8 @@ pub fn MenuPanel() -> Element {
 }
 
 fn request_loop(mut main_state: Signal<MainState>) {
-    let mut eval = eval(
-        r#"
-
-        dioxus.send("");
-        
-        setInterval(function(){
-            dioxus.send("");
-        }, 1000);
-        "#,
-    );
-
     spawn(async move {
         loop {
-            eval.recv().await.unwrap();
-
             let env_id = main_state.read().get_active_env_id();
 
             let result = get_metrics(env_id).await;
@@ -165,13 +154,14 @@ fn request_loop(mut main_state: Signal<MainState>) {
                     main_state.write().data = None;
                 }
             }
+
+            dioxus_utils::js::sleep(Duration::from_secs(1)).await;
         }
     });
 }
 
 #[server]
 async fn get_metrics(env: String) -> Result<RequestApiModel, ServerFnError> {
-    let result = crate::APP_CTX.cached_data.get(env.as_str()).await;
-
+    let result = crate::server::APP_CTX.cached_data.get(env.as_str()).await;
     return Ok(result);
 }

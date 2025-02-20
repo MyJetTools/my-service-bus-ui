@@ -23,12 +23,7 @@ impl MyTimerTick for UpdateTimer {
         for env in &setings.envs {
             println!("Loading data for env '{}'", env.id);
             let started_moment = DateTimeAsMicroseconds::now();
-            let fl_url = env
-                .get_fl_url(
-                    setings.ssh_credentials.as_ref(),
-                    &self.ctx.ssh_sessions_pool,
-                )
-                .await;
+            let fl_url = crate::server::APP_CTX.get_fl_url(env).await;
 
             let result: Result<RequestApiModel, _> = fl_url
                 .append_path_segment("status")
@@ -49,7 +44,10 @@ impl MyTimerTick for UpdateTimer {
 
             result.sessions.items.sort_by(|a, b| a.id.cmp(&b.id));
 
-            crate::APP_CTX.cached_data.update(&env.id, result).await;
+            crate::server::APP_CTX
+                .cached_data
+                .update(&env.id, result)
+                .await;
 
             let now = DateTimeAsMicroseconds::now();
             println!(

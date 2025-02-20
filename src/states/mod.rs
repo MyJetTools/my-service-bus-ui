@@ -18,3 +18,5 @@ mod subscriber_api_model;
 pub use subscriber_api_model::*;
 mod page_api_model;
 pub use page_api_model::*;
+mod dialog_state;
+pub use dialog_state::*;
