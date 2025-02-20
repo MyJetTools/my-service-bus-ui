@@ -14,12 +14,15 @@ envs:
   sb_api_url: https://env-1-url/
 
 - id: evn-2
-  sb_api_url: https://env-2-url/
-  cert_location: ~/cert.p12
-  cert_password: password
+  sb_api_url: "ssh:test@10.0.0.0:22->http://localhost:5001"
 
 - id: env-3
   sb_api_url: https://49.13.227.81
   host: domain.com
+
+ssh_private_keys:
+  ssh:test@10.0.0.0:22:
+    cert_path: ~/.ssh/id_rsa
+    cert_pass_phrase: pass 
 
 ```
