@@ -4,7 +4,7 @@ on:
     tags: ["*"]
 
 env:
-  IMAGE_NAME: myjettools/my-sb-ui
+  IMAGE_NAME: myjettools/my-service-bus-ui
 
 jobs:
   build:
