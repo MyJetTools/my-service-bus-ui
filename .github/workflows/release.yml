@@ -4,7 +4,7 @@ on:
     tags: ["*"]
 
 env:
-  IMAGE_NAME: ghcr.io/myjettools/my-sb-ui
+  IMAGE_NAME: myjettools/my-sb-ui
 
 jobs:
   build:
@@ -33,14 +33,7 @@ jobs:
           apt install zip 
           zip -r data.zip ./target/dx/my-sb-ui/release/web ./Dockerfile
           curl -X 'POST' 'https://jetdev.eu/file/my-sb-ui-build.zip' -H 'accept: */*' -H 'Content-Type: multipart/form-data' -F 'file=@data.zip;type=application/zip'
-       
-#      - name: Upload Build Artifacts
-#        uses: actions/upload-artifact@v3
-#        with:
-#          name: build-artifacts
-#          path: |
-#            ./target/dx/admin/release/web
-#            ./Dockerfile
+
 
   publish:
     runs-on: ubuntu-22.04
@@ -61,9 +54,14 @@ jobs:
         run: echo ::set-output name=VERSION::$(echo ${GITHUB_REF_NAME})          
 
       - name: Docker login
+        env:
+          DOCKER_USER: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASS: ${{ secrets.DOCKER_PASSWORD }}
         run: |          
-          echo "${{ secrets.PUBLISH_TOKEN }}" | docker login https://ghcr.io -u "${{ github.actor }}" --password-stdin   
+          echo "$DOCKER_PASS" | docker login --username "$DOCKER_USER" --password-stdin   
       - name: Docker Build and Publish
-        run: |          
-          docker build -t ${IMAGE_NAME}:${{ steps.get_version.outputs.VERSION }} .
-          docker push ${IMAGE_NAME}:${{ steps.get_version.outputs.VERSION }}
+        run: |
+          ver=${GITHUB_REF_NAME}
+          echo $ver                  
+          docker build -t ${IMAGE_NAME}:$ver .
+          docker push ${IMAGE_NAME}:$ver
