@@ -72,12 +72,19 @@ pub fn render_subscriber(main_state: &MainState, subscriber: &SubscriberApiModel
                 }
                 td {
                     {subscriber_info}
-                    div { class: "info-line-xs",
-                        {env_info}
-                        "{session.name}"
+                    div { class: "info-line-xs", "{session.name}" }
+                    table { style: "width: 100%",
+                        tr {
+                            td {
+                                div { class: "info-line-xs",
+                                    b { "MY-SB-SDK ver: " }
+                                    "{session.get_session_as_string()}"
+                                }
+                                div { class: "info-line-xs", "{session.ip}" }
+                            }
+                            td { style: "text-align:right; vertical-align:top", {env_info} }
+                        }
                     }
-                    div { class: "info-line-xs", "{session.get_session_as_string()}" }
-                    div { class: "info-line-xs", "{session.ip}" }
                     RenderGraph { elements: values, is_amount: false }
                 }
             }

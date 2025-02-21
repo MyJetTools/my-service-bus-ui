@@ -49,9 +49,20 @@ pub fn RenderTopicConnections(topic_id: Rc<String>) -> Element {
                             }
                             td {
                                 div { class: "info-line-bold", "{session.name}" }
-                                div { class: "info-line", "{session.get_session_as_string()}" }
-                                {env_info}
-                                div { class: "info-line", "{session.ip}" }
+                                div {
+                                    class: "info-line",
+                                    style: "font-size: 10px;",
+                                    b { "MY-SB-SDK ver: " }
+                                    "{session.get_session_as_string()}"
+                                }
+                                table { style: "width: 100%",
+                                    tr {
+                                        td {
+                                            div { class: "info-line", "{session.ip}" }
+                                        }
+                                        td { style: "text-align:right", {env_info} }
+                                    }
+                                }
                             }
                         }
                     }

@@ -113,16 +113,16 @@ pub fn RenderConnections() -> Element {
                     div { class: "info-line-bold", "{session.name}" }
 
                     div { class: "info-line-xs",
-                        b { "Client ver: " }
+                        b { "MY-SB-SDK ver: " }
                         "{session.get_session_as_string()}"
                     }
 
                     div { class: "info-line-xs",
                         b { "Ip: " }
-                        "{session.ip}"
+                        "{session.ip} "
+                        {env_info}
                     }
 
-                    div { class: "info-line-xs", {env_info} }
 
                     div { class: "info-line-xs",
                         b { "Connected: " }
