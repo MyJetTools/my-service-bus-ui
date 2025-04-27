@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use flurl::{my_ssh::SshSessionsPool, FlUrl};
+use flurl::FlUrl;
 use my_settings_reader::SettingsReader;
 use rust_extensions::AppStates;
 

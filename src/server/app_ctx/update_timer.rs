@@ -25,13 +25,14 @@ impl MyTimerTick for UpdateTimer {
             let started_moment = DateTimeAsMicroseconds::now();
             let fl_url = crate::server::APP_CTX.get_fl_url(env).await;
 
-            let result: Result<RequestApiModel, _> = fl_url
-                .append_path_segment("status")
-                .get()
-                .await
-                .unwrap()
-                .get_json()
-                .await;
+            let fl_url_response = fl_url.append_path_segment("status").get().await;
+
+            if let Err(err) = &fl_url_response {
+                println!("Env: {}. {:?}", env.id, err);
+                continue;
+            }
+
+            let result: Result<RequestApiModel, _> = fl_url_response.unwrap().get_json().await;
 
             if let Err(err) = &result {
                 eprintln!("Error loading data from env: {}. Err: {:?}", env.id, err);
