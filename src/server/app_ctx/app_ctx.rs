@@ -26,7 +26,8 @@ impl AppCtx {
     pub async fn get_fl_url(&self, env_settings: &EnvSettingsModel) -> FlUrl {
         let settings = self.settings_reader.get_settings().await;
         let fl_url = FlUrl::new(env_settings.sb_api_url.as_str())
-            .set_ssh_security_credentials_resolver(settings);
+            .set_ssh_security_credentials_resolver(settings)
+            .update_mode(flurl::FlUrlMode::Http1NoHyper);
         fl_url
     }
 }

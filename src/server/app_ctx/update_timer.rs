@@ -28,7 +28,7 @@ impl MyTimerTick for UpdateTimer {
             let fl_url_response = fl_url.append_path_segment("status").get().await;
 
             if let Err(err) = &fl_url_response {
-                println!("Env: {}. {:?}", env.id, err);
+                eprintln!("Env: {}. {:?}", env.id, err);
                 continue;
             }
 
