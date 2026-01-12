@@ -1,9 +1,6 @@
 use dioxus::prelude::*;
 
-use crate::{
-    states::{MainState, SubscriberApiModel},
-    views::RenderGraph,
-};
+use crate::{models::SubscriberApiModel, states::MainState, views::RenderGraph};
 
 pub fn render_subscriber(main_state: &MainState, subscriber: &SubscriberApiModel) -> Element {
     let subscriber_led = if subscriber.active == 0 {

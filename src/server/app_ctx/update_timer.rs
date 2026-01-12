@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use rust_extensions::{date_time::DateTimeAsMicroseconds, MyTimerTick};
 
-use crate::RequestApiModel;
+use crate::models::RequestApiModel;
 
 use super::AppCtx;
 

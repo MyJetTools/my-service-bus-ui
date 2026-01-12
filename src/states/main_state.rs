@@ -1,9 +1,7 @@
 use std::collections::HashMap;
 
-use super::{
-    DialogState, SessionApiModel, StatusBarState, SubscriberApiModel, TopicApiModel,
-    TopicQueueWrapperApiModel,
-};
+use super::{DialogState, StatusBarState};
+use crate::models::*;
 
 #[derive(Debug, Clone)]
 pub enum ActiveWindow {

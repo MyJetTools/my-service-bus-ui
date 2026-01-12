@@ -1,7 +1,8 @@
 use dioxus::prelude::*;
 
 use crate::{
-    states::{MainState, SessionType},
+    models::*,
+    states::MainState,
     utils::format_mem,
 };
 

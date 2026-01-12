@@ -1,7 +1,8 @@
 use std::time::Duration;
 
 use crate::{
-    states::{ActiveWindow, MainState, RequestApiModel},
+    api::*,
+    states::{ActiveWindow, MainState},
     DataToRender, StatusBarState,
 };
 use dioxus::prelude::*;
@@ -158,10 +159,4 @@ fn request_loop(mut main_state: Signal<MainState>) {
             dioxus_utils::js::sleep(Duration::from_secs(1)).await;
         }
     });
-}
-
-#[server]
-async fn get_metrics(env: String) -> Result<RequestApiModel, ServerFnError> {
-    let result = crate::server::APP_CTX.cached_data.get(env.as_str()).await;
-    return Ok(result);
 }

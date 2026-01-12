@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use tokio::sync::Mutex;
 
-use crate::RequestApiModel;
+use crate::models::RequestApiModel;
 
 pub struct CachedData {
     data: Mutex<HashMap<String, RequestApiModel>>,

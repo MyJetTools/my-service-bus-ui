@@ -4,10 +4,14 @@ use dioxus::prelude::*;
 #[cfg(feature = "server")]
 use dioxus::server::IncrementalRendererConfig;
 
+use crate::api::*;
+
 mod states;
 
 mod views;
 
+mod api;
+mod models;
 mod utils;
 
 use views::*;
@@ -47,7 +51,8 @@ fn App() -> Element {
     match &*data {
         Some(data) => match data {
             Ok(result) => {
-                main_state.write().set_environments(result.clone());
+                let envs = result.clone();
+                main_state.write().set_environments(envs);
                 return ActiveApp();
             }
             Err(err) => {
@@ -86,10 +91,4 @@ fn ActiveApp() -> Element {
             RenderDialog {}
         }
     }
-}
-
-#[server]
-async fn get_envs() -> Result<Vec<String>, ServerFnError> {
-    let settings = crate::server::APP_CTX.settings_reader.get_settings().await;
-    Ok(settings.envs.iter().map(|env| env.id.clone()).collect())
 }
