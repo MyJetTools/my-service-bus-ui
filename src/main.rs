@@ -1,6 +1,9 @@
 use dialogs::*;
 use dioxus::prelude::*;
 
+#[cfg(feature = "server")]
+use dioxus::server::IncrementalRendererConfig;
+
 mod states;
 
 mod views;

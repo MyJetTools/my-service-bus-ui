@@ -32,9 +32,9 @@ rust-extensions = { tag = "0.1.5", git = "https://github.com/MyJetTools/rust-ext
 
 my-logger = { tag = "1.2.1", git = "https://github.com/MyJetTools/my-logger.git", optional = true }
 
-dioxus = { version = "0.6", features = ["fullstack", "router"] }
+dioxus = { version = "0.7", features = ["fullstack", "router"] }
 
-dioxus-utils = { tag = "0.6.0", git = "https://github.com/MyJetTools/dioxus-utils.git", features = [
+dioxus-utils = { tag = "0.7.0", git = "https://github.com/MyJetTools/dioxus-utils.git", features = [
     "fullstack",
 ] }
 
@@ -53,6 +53,9 @@ my-settings-reader = { tag = "0.4.1", git = "https://github.com/MyJetTools/my-se
 
 [dev-dependencies]
 serde_json = "*"
+
+[build-dependencies]
+ci-utils = { tag = "0.1.3", git = "https://github.com/MyJetTools/ci-utils.git" }
 
 [profile]
 
