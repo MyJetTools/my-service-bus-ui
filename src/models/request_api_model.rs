@@ -15,8 +15,9 @@ pub struct RequestApiModel {
     pub queues: HashMap<String, TopicQueueWrapperApiModel>,
 }
 
-impl RequestApiModel {
-    pub fn default() -> Self {
+impl Default for RequestApiModel
+{
+  fn default() -> Self {
         Self {
             topics: TopicsApiModel { items: vec![] },
             sessions: SessionsApiModel {
